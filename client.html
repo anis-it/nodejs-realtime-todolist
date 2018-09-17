@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    <title>Ma todolist</title>
+    <style>
+        span.deleteCross {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ma todolist</h1>
+    <ul id="todoList">
+
+    </ul>
+    <div>
+        <label for="newTodo">Que dois-je faire ? </label>
+        <input type="text" name="newTodo" id="newTodo" autofocus />
+        <input type="button" value="Valider" onclick="addTodo()" />
+    </div>
+
+    <!-- partie script -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        var socket = io();
+        var pseudo;
+
+        // fonction de notification de recuperation de la derniere todolist ( appele a chaque changement)
+        socket.on('update todolist', function (todoList) {
+            for (let todo of todoList) {
+                $("#todoList").append("<li><span class='deleteCross'>✘</span> element</li>");
+            }
+        });
+
+        // fonction de suppression d'une todo 
+        function deleteTodo() {
+            socket.emit('delete todo', { index: index });
+            // puis on vide le champs d'ajout de todo
+            document.getElementById('newTodo').value = ""
+        }
+
+        // fonction d'ajout d'une todo
+        function addTodo() {
+            $('form').submit(false);
+            var newTodo = document.getElementById('newTodo').value
+            socket.emit("add todo", newTodo);
+            // puis on vide le champs d'ajout de todo
+            document.getElementById('newTodo').value = ""
+        }
+
+    </script>
+
+</body>
+
+</html>
