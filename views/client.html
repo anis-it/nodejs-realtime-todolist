@@ -1,7 +1,7 @@
 <html>
-
 <head>
     <title>Ma todolist</title>
+    <meta charset="UTF-8">
     <style>
         span.deleteCross {
             text-decoration: none;
@@ -9,17 +9,16 @@
         }
     </style>
 </head>
-
 <body>
     <h1>Ma todolist</h1>
     <ul id="todoList">
 
     </ul>
-    <div>
+    <form>
         <label for="newTodo">Que dois-je faire ? </label>
         <input type="text" name="newTodo" id="newTodo" autofocus />
         <input type="button" value="Valider" onclick="addTodo()" />
-    </div>
+    </form>
 
     <!-- partie script -->
     <script src="/socket.io/socket.io.js"></script>
@@ -28,16 +27,22 @@
         var socket = io();
         var pseudo;
 
-        // fonction de notification de recuperation de la derniere todolist ( appele a chaque changement)
-        socket.on('update todolist', function (todoList) {
-            for (let todo of todoList) {
-                $("#todoList").append("<li><span class='deleteCross'>✘</span> element</li>");
+        // mise a jout de la todolist( appelé la premire fois puis à chaque changement)
+        socket.on('update todolist', function (todolist) {
+            var index = 0;
+            // on vide la todolist actuellement affiché
+            $("#todoList").empty();
+            // puis on charge la todolist mise à jour
+            todolist.forEach((todo) => {
+                $("#todoList").append("<li><span class='deleteCross' onclick='deleteTodo(" + index + ")'>✘</span> " + todo + "</li>");
+                index++;
             }
+            );
         });
 
         // fonction de suppression d'une todo 
-        function deleteTodo() {
-            socket.emit('delete todo', { index: index });
+        function deleteTodo(index) {
+            socket.emit('delete todo', index);
             // puis on vide le champs d'ajout de todo
             document.getElementById('newTodo').value = ""
         }
@@ -50,9 +55,6 @@
             // puis on vide le champs d'ajout de todo
             document.getElementById('newTodo').value = ""
         }
-
     </script>
-
 </body>
-
 </html>
